@@ -16,9 +16,14 @@ const Index = () => {
   const handleEmergencyClick = () => {
     toast({
       title: "Emergency Mode",
-      description: "This would activate emergency support in a real application.",
+      description: "Redirecting to emergency support services.",
       variant: "destructive",
     });
+    
+    // Delay to show the toast before redirecting
+    setTimeout(() => {
+      window.location.href = '/emergency-support';
+    }, 1000);
   };
 
   return (

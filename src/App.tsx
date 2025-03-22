@@ -7,6 +7,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
+import SupportCircles from "./pages/SupportCircles";
+import EmergencySupport from "./pages/EmergencySupport";
 import { useEffect } from "react";
 
 const queryClient = new QueryClient();
@@ -28,6 +30,8 @@ const App = () => {
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/support-circles" element={<SupportCircles />} />
+            <Route path="/emergency-support" element={<EmergencySupport />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
