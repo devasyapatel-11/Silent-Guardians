@@ -56,7 +56,7 @@ const Header = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2 text-foreground" onClick={closeMobileMenu}>
             <Shield className="h-8 w-8 text-primary animate-pulse-subtle" />
-            <span className="font-semibold text-lg">SecureSisterhood</span>
+            <span className="font-semibold text-lg">Silent Guardians</span>
           </Link>
 
           {/* Desktop Navigation */}

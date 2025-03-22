@@ -10,7 +10,7 @@ const Footer = () => {
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
               <Shield className="h-6 w-6 text-primary" />
-              <h2 className="text-lg font-semibold">SecureSisterhood</h2>
+              <h2 className="text-lg font-semibold">Silent Guardians</h2>
             </div>
             <p className="text-sm text-muted-foreground">
               A secure, anonymous support network for women, built with privacy as the foundation.
@@ -84,16 +84,16 @@ const Footer = () => {
               <li className="flex items-center space-x-2">
                 <Mail size={16} className="text-muted-foreground" />
                 <a 
-                  href="mailto:secure@sisterhood.org" 
+                  href="mailto:secure@silentguardians.org" 
                   className="text-muted-foreground hover:text-foreground transition-colors duration-200 text-sm flex items-center"
                 >
-                  secure@sisterhood.org
+                  secure@silentguardians.org
                   <Lock size={12} className="ml-1 text-safe-500" />
                 </a>
               </li>
               <li>
                 <a 
-                  href="https://github.com/secure-sisterhood" 
+                  href="https://github.com/silent-guardians" 
                   target="_blank" 
                   rel="noopener noreferrer" 
                   className="text-muted-foreground hover:text-foreground transition-colors duration-200 text-sm flex items-center"
@@ -109,7 +109,7 @@ const Footer = () => {
         <div className="mt-12 pt-8 border-t border-border">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-sm text-muted-foreground">
-              &copy; {new Date().getFullYear()} SecureSisterhood. All rights reserved.
+              &copy; {new Date().getFullYear()} Silent Guardians. All rights reserved.
             </p>
             <div className="flex items-center space-x-3 mt-4 md:mt-0">
               <div className="flex items-center text-xs text-muted-foreground">
