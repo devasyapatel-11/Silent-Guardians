@@ -1,10 +1,31 @@
 
-import { supabase } from '@/lib/supabase';
-import { SupportCircle, EmergencyService } from '@/types';
+import { supabase } from '@/integrations/supabase/client';
+import { SupportCircle, EmergencyService, User } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
 
 // API services using Supabase
 export const api = {
+  // Auth
+  getCurrentUser: async (): Promise<User | null> => {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) return null;
+    
+    // Get profile data
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single();
+    
+    return profile ? {
+      id: user.id,
+      email: user.email,
+      avatarUrl: profile.avatar_url,
+      createdAt: user.created_at
+    } : null;
+  },
+  
   // Support circles
   getSupportCircles: async (): Promise<SupportCircle[]> => {
     const { data, error } = await supabase
@@ -45,13 +66,13 @@ export const api = {
       throw error;
     }
     
-    // Update member count
-    const { error: updateError } = await supabase.rpc('increment_circle_members', {
+    // Update member count using the function
+    const { error: fnError } = await supabase.rpc('increment_circle_members', {
       circle_id: circleId
     });
     
-    if (updateError) {
-      console.error('Error updating member count:', updateError);
+    if (fnError) {
+      console.error('Error updating member count:', fnError);
     }
     
     return { success: true };
@@ -125,5 +146,30 @@ export const api = {
       referenceNumber,
       estimatedResponseTime: data?.response_time || '< 15 minutes'
     };
+  },
+  
+  // Profile
+  updateProfile: async (updates: { username?: string; avatarUrl?: string }): Promise<{ success: boolean }> => {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      throw new Error('You must be logged in to update your profile');
+    }
+    
+    const { error } = await supabase
+      .from('profiles')
+      .update({
+        username: updates.username,
+        avatar_url: updates.avatarUrl,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', user.id);
+    
+    if (error) {
+      console.error('Error updating profile:', error);
+      throw error;
+    }
+    
+    return { success: true };
   }
 };

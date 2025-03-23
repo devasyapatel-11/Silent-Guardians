@@ -9,13 +9,174 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      circle_memberships: {
+        Row: {
+          circle_id: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          circle_id: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          circle_id?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "circle_memberships_circle_id_fkey"
+            columns: ["circle_id"]
+            isOneToOne: false
+            referencedRelation: "support_circles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      emergency_services: {
+        Row: {
+          available_24_hours: boolean
+          contact_method: string
+          created_at: string
+          description: string
+          id: string
+          name: string
+          response_time: string
+        }
+        Insert: {
+          available_24_hours?: boolean
+          contact_method: string
+          created_at?: string
+          description: string
+          id?: string
+          name: string
+          response_time: string
+        }
+        Update: {
+          available_24_hours?: boolean
+          contact_method?: string
+          created_at?: string
+          description?: string
+          id?: string
+          name?: string
+          response_time?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          id: string
+          updated_at: string
+          username: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          id: string
+          updated_at?: string
+          username?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          id?: string
+          updated_at?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
+      support_circles: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          last_active: string
+          member_count: number
+          name: string
+          type: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          id?: string
+          last_active?: string
+          member_count?: number
+          name: string
+          type: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          last_active?: string
+          member_count?: number
+          name?: string
+          type?: string
+        }
+        Relationships: []
+      }
+      support_requests: {
+        Row: {
+          anonymous_contact_info: string | null
+          created_at: string
+          id: string
+          reference_number: string
+          service_id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          anonymous_contact_info?: string | null
+          created_at?: string
+          id?: string
+          reference_number: string
+          service_id: string
+          status: string
+          user_id: string
+        }
+        Update: {
+          anonymous_contact_info?: string | null
+          created_at?: string
+          id?: string
+          reference_number?: string
+          service_id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_requests_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "emergency_services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      decrement_circle_members: {
+        Args: {
+          circle_id: string
+        }
+        Returns: undefined
+      }
+      increment_circle_members: {
+        Args: {
+          circle_id: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
