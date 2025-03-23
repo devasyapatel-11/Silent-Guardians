@@ -16,3 +16,20 @@ export interface EmergencyService {
   available24Hours: boolean;
   responseTime: string;
 }
+
+export interface User {
+  id: string;
+  email?: string;
+  avatarUrl?: string;
+  createdAt: string;
+}
+
+export interface SupportRequest {
+  id: string;
+  userId: string;
+  serviceId: string;
+  anonymousContactInfo?: string;
+  status: 'pending' | 'in_progress' | 'completed';
+  referenceNumber: string;
+  createdAt: string;
+}

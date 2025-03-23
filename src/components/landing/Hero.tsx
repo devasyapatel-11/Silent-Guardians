@@ -26,7 +26,7 @@ const Hero = () => {
             
             <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
               <Button asChild size="lg" className="rounded-full px-8">
-                <Link to="/join">
+                <Link to="/auth/register">
                   Join Securely <ArrowRight size={16} className="ml-2" />
                 </Link>
               </Button>

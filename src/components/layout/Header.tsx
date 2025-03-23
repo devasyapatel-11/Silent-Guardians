@@ -1,14 +1,17 @@
 
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Shield, Menu, X, Moon, Sun } from 'lucide-react';
+import { Shield, Menu, X, Moon, Sun, User, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/contexts/AuthContext';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const location = useLocation();
+  const { user, signOut } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -45,6 +48,11 @@ const Header = () => {
     return location.pathname === path;
   };
 
+  const handleSignOut = async () => {
+    await signOut();
+    closeMobileMenu();
+  };
+
   return (
     <header 
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -64,11 +72,11 @@ const Header = () => {
             <Link to="/how-it-works" className={`nav-link ${isActive('/how-it-works') ? 'text-foreground font-medium' : ''}`}>
               How It Works
             </Link>
-            <Link to="/join" className={`nav-link ${isActive('/join') ? 'text-foreground font-medium' : ''}`}>
-              Join Securely
+            <Link to="/support-circles" className={`nav-link ${isActive('/support-circles') ? 'text-foreground font-medium' : ''}`}>
+              Support Circles
             </Link>
-            <Link to="/get-help" className={`nav-link ${isActive('/get-help') ? 'text-foreground font-medium' : ''}`}>
-              Get Help
+            <Link to="/emergency-support" className={`nav-link ${isActive('/emergency-support') ? 'text-foreground font-medium' : ''}`}>
+              Emergency Help
             </Link>
             <Link to="/resources" className={`nav-link ${isActive('/resources') ? 'text-foreground font-medium' : ''}`}>
               Resources
@@ -85,11 +93,38 @@ const Header = () => {
               {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
             </button>
             
-            <div className="hidden md:block">
-              <Button asChild className="bg-primary hover:bg-primary/90 text-white rounded-full px-6 py-2">
-                <Link to="/dashboard">Dashboard</Link>
-              </Button>
-            </div>
+            {user ? (
+              <div className="hidden md:block">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                      <User className="h-5 w-5" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem asChild>
+                      <Link to="/dashboard">Dashboard</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/profile">Profile</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleSignOut}>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Log out</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            ) : (
+              <div className="hidden md:block">
+                <Button asChild variant="ghost" className="mr-2">
+                  <Link to="/auth/login">Log in</Link>
+                </Button>
+                <Button asChild className="bg-primary hover:bg-primary/90 text-white rounded-full px-6 py-2">
+                  <Link to="/auth/register">Sign Up</Link>
+                </Button>
+              </div>
+            )}
             
             <button
               className="p-2 rounded-md md:hidden text-foreground"
@@ -116,18 +151,18 @@ const Header = () => {
               How It Works
             </Link>
             <Link
-              to="/join"
+              to="/support-circles"
               className="block px-3 py-2 rounded-md text-base font-medium hover:bg-secondary transition duration-150 ease-in-out"
               onClick={closeMobileMenu}
             >
-              Join Securely
+              Support Circles
             </Link>
             <Link
-              to="/get-help"
+              to="/emergency-support"
               className="block px-3 py-2 rounded-md text-base font-medium hover:bg-secondary transition duration-150 ease-in-out"
               onClick={closeMobileMenu}
             >
-              Get Help
+              Emergency Help
             </Link>
             <Link
               to="/resources"
@@ -137,9 +172,26 @@ const Header = () => {
               Resources
             </Link>
             <div className="pt-2">
-              <Button asChild className="w-full bg-primary hover:bg-primary/90 text-white rounded-full">
-                <Link to="/dashboard" onClick={closeMobileMenu}>Dashboard</Link>
-              </Button>
+              {user ? (
+                <>
+                  <Button asChild className="w-full mb-2">
+                    <Link to="/dashboard" onClick={closeMobileMenu}>Dashboard</Link>
+                  </Button>
+                  <Button variant="outline" className="w-full" onClick={handleSignOut}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log out</span>
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button asChild variant="outline" className="w-full mb-2">
+                    <Link to="/auth/login" onClick={closeMobileMenu}>Log in</Link>
+                  </Button>
+                  <Button asChild className="w-full">
+                    <Link to="/auth/register" onClick={closeMobileMenu}>Sign Up</Link>
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </div>
