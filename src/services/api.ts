@@ -37,13 +37,13 @@ export const api = {
       throw error;
     }
     
-    // Transform from snake_case to camelCase
+    // Transform from snake_case to camelCase and ensure correct type casting
     return data.map(circle => ({
       id: circle.id,
       name: circle.name,
       description: circle.description,
       memberCount: circle.member_count,
-      type: circle.type,
+      type: circle.type as "domestic-violence" | "workplace-harassment" | "legal-guidance" | "mental-health" | "financial-independence",
       lastActive: circle.last_active
     }));
   },
@@ -89,12 +89,12 @@ export const api = {
       throw error;
     }
     
-    // Transform from snake_case to camelCase
+    // Transform from snake_case to camelCase and ensure correct type casting
     return data.map(service => ({
       id: service.id,
       name: service.name,
       description: service.description,
-      contactMethod: service.contact_method,
+      contactMethod: service.contact_method as "call" | "chat" | "both",
       available24Hours: service.available_24_hours,
       responseTime: service.response_time
     }));
