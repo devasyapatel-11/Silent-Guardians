@@ -78,17 +78,21 @@ export function useChat(circleId: string) {
       console.log("New message received:", newMessage);
       
       // Fetch user profile for the new message
-      const { data: profileData } = await supabase
+      const { data: profileData, error } = await supabase
         .from("profiles")
         .select("username, avatar_url")
         .eq("id", newMessage.user_id)
         .single();
+        
+      if (error) {
+        console.error("Error fetching profile for new message:", error);
+      }
 
       setMessages((prevMessages) => [
         ...prevMessages,
         {
           ...newMessage,
-          username: profileData?.username,
+          username: profileData?.username || "Unknown",
           avatar_url: profileData?.avatar_url,
         },
       ]);
@@ -103,6 +107,10 @@ export function useChat(circleId: string) {
         description: "You must be logged in to send messages",
         variant: "destructive",
       });
+      return;
+    }
+
+    if (!content.trim()) {
       return;
     }
 
