@@ -3,7 +3,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User as SupabaseUser, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 interface AuthContextType {
   user: SupabaseUser | null;
@@ -22,7 +22,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
-  const navigate = useNavigate();
+  // Create a navigate function reference that will be populated later
+  const [navigateFn, setNavigateFn] = useState<((to: string) => void) | null>(null);
+  
+  // Get the navigate function if we're inside a Router
+  useEffect(() => {
+    try {
+      const navigate = useNavigate();
+      setNavigateFn(() => navigate);
+    } catch (error) {
+      console.log("Router not available yet, navigation functions will be limited");
+    }
+  }, []);
 
   useEffect(() => {
     // Set up auth state listener FIRST
@@ -69,7 +80,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         description: "You've successfully logged in",
       });
       
-      navigate('/dashboard');
+      if (navigateFn) {
+        navigateFn('/dashboard');
+      }
     } catch (error) {
       console.error("Sign in error:", error);
       throw error;
@@ -137,7 +150,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       });
       
       // Navigate to home page after logout
-      navigate('/');
+      if (navigateFn) {
+        navigateFn('/');
+      }
     } catch (error) {
       console.error("Sign out error:", error);
     } finally {
