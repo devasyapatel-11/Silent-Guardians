@@ -31,7 +31,7 @@ export function useRealtime<T>({
     // Add subscription for each event type
     events.forEach((event) => {
       newChannel.on(
-        "postgres_changes",
+        "postgres_changes" as any,
         {
           event,
           schema,

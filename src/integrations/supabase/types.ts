@@ -38,6 +38,38 @@ export type Database = {
           },
         ]
       }
+      circle_messages: {
+        Row: {
+          circle_id: string
+          content: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          circle_id: string
+          content: string
+          created_at?: string
+          id: string
+          user_id: string
+        }
+        Update: {
+          circle_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "circle_messages_circle_id_fkey"
+            columns: ["circle_id"]
+            isOneToOne: false
+            referencedRelation: "support_circles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       emergency_services: {
         Row: {
           available_24_hours: boolean

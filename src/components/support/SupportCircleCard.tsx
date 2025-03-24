@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -5,6 +6,7 @@ import { Users, MessageSquare, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
+import { SupportCircle } from '@/types';
 
 interface SupportCircleCardProps {
   id: string;
@@ -14,6 +16,7 @@ interface SupportCircleCardProps {
   type: 'domestic-violence' | 'workplace-harassment' | 'legal-guidance' | 'mental-health' | 'financial-independence';
   lastActive: string;
   onJoin: (id: string) => void;
+  isJoining?: boolean;
 }
 
 const SupportCircleCard = ({
@@ -24,6 +27,7 @@ const SupportCircleCard = ({
   type,
   lastActive,
   onJoin,
+  isJoining = false,
 }: SupportCircleCardProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -93,9 +97,9 @@ const SupportCircleCard = ({
         <Button 
           size="sm" 
           onClick={handleJoin}
-          disabled={joining}
+          disabled={joining || isJoining}
         >
-          {joining ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Users className="mr-2 h-4 w-4" />}
+          {(joining || isJoining) ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Users className="mr-2 h-4 w-4" />}
           Join Circle
         </Button>
       </CardFooter>

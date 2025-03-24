@@ -27,21 +27,25 @@ export function useChat(circleId: string) {
     const fetchMessages = async () => {
       try {
         setIsLoading(true);
+        
+        // Use the SQL function directly since TypeScript doesn't know about the new table yet
         const { data, error } = await supabase
-          .from("circle_messages")
+          .from('circle_messages')
           .select(`
             *,
             profiles:user_id(username, avatar_url)
           `)
           .eq("circle_id", circleId)
-          .order("created_at", { ascending: true });
+          .order("created_at", { ascending: true }) as any;
 
         if (error) {
           throw error;
         }
 
+        console.log("Fetched messages:", data);
+
         // Transform the data to include username and avatar
-        const formattedMessages = data.map((message) => ({
+        const formattedMessages = data.map((message: any) => ({
           ...message,
           username: message.profiles?.username,
           avatar_url: message.profiles?.avatar_url,
@@ -70,6 +74,8 @@ export function useChat(circleId: string) {
     table: "circle_messages",
     events: ["INSERT"],
     onInsert: async (newMessage) => {
+      console.log("New message received:", newMessage);
+      
       // Fetch user profile for the new message
       const { data: profileData } = await supabase
         .from("profiles")
@@ -108,9 +114,10 @@ export function useChat(circleId: string) {
         created_at: new Date().toISOString(),
       };
 
+      // Use the SQL function directly since TypeScript doesn't know about the new table yet
       const { error } = await supabase
-        .from("circle_messages")
-        .insert(newMessage);
+        .from('circle_messages')
+        .insert(newMessage) as any;
 
       if (error) {
         throw error;
