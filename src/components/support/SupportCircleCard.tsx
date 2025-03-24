@@ -1,72 +1,105 @@
-
-import React from 'react';
-import { SupportCircle } from '@/types';
-import { Users, Clock } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { formatDistanceToNow } from 'date-fns';
+import React, { useState } from 'react';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Users, MessageSquare, Loader2 } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 interface SupportCircleCardProps {
-  circle: SupportCircle;
+  id: string;
+  name: string;
+  description: string;
+  memberCount: number;
+  type: 'domestic-violence' | 'workplace-harassment' | 'legal-guidance' | 'mental-health' | 'financial-independence';
+  lastActive: string;
   onJoin: (id: string) => void;
-  isJoining?: boolean;
 }
 
-const SupportCircleCard: React.FC<SupportCircleCardProps> = ({
-  circle,
+const SupportCircleCard = ({
+  id,
+  name,
+  description,
+  memberCount,
+  type,
+  lastActive,
   onJoin,
-  isJoining = false
-}) => {
-  const getIconByType = () => {
-    switch (circle.type) {
-      case 'domestic-violence':
-        return <span className="text-red-500">🏠</span>;
-      case 'workplace-harassment':
-        return <span className="text-blue-500">💼</span>;
-      case 'legal-guidance':
-        return <span className="text-purple-500">⚖️</span>;
-      case 'mental-health':
-        return <span className="text-green-500">🧠</span>;
-      case 'financial-independence':
-        return <span className="text-yellow-500">💰</span>;
-      default:
-        return <span className="text-gray-500">👥</span>;
+}: SupportCircleCardProps) => {
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [joining, setJoining] = useState(false);
+  const navigate = useNavigate();
+
+  const handleJoin = async () => {
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to join a support circle",
+        variant: "destructive",
+      });
+      navigate("/auth/login");
+      return;
+    }
+    
+    setJoining(true);
+    try {
+      await onJoin(id);
+      toast({
+        title: "Success",
+        description: "You've joined the support circle!",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error?.message || "Failed to join support circle",
+        variant: "destructive",
+      });
+    } finally {
+      setJoining(false);
     }
   };
 
   return (
-    <div className="glass-card p-5 rounded-xl hover:shadow-md transition-all duration-300">
-      <div className="flex items-start justify-between mb-3">
-        <div className="text-2xl mb-1">{getIconByType()}</div>
-        <div className="flex items-center text-xs text-muted-foreground">
-          <Clock size={12} className="mr-1" />
-          <span>
-            {formatDistanceToNow(new Date(circle.lastActive), { addSuffix: true })}
-          </span>
-        </div>
-      </div>
+    <Card className="h-full transition-all hover:shadow-md">
+      <CardHeader>
+        <CardTitle>{name}</CardTitle>
+      </CardHeader>
       
-      <h3 className="text-lg font-medium mb-2">{circle.name}</h3>
-      <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-        {circle.description}
-      </p>
+      <CardContent>
+        <p className="text-muted-foreground">{description}</p>
+      </CardContent>
       
-      <div className="flex justify-between items-center">
-        <div className="flex items-center text-xs text-muted-foreground">
-          <Users size={14} className="mr-1" />
-          <span>{circle.memberCount} members</span>
-        </div>
+      <CardFooter className="flex justify-between">
+        <Button 
+          variant="outline" 
+          size="sm"
+          onClick={() => {
+            if (user) {
+              navigate(`/chat/${id}`);
+            } else {
+              toast({
+                title: "Authentication required",
+                description: "Please sign in to access the chat",
+                variant: "destructive",
+              });
+              navigate("/auth/login");
+            }
+          }}
+        >
+          <MessageSquare className="mr-2 h-4 w-4" />
+          Chat Now
+        </Button>
         
         <Button 
-          variant="outline"
-          size="sm"
-          className="rounded-full"
-          onClick={() => onJoin(circle.id)}
-          disabled={isJoining}
+          size="sm" 
+          onClick={handleJoin}
+          disabled={joining}
         >
-          {isJoining ? "Joining..." : "Join Circle"}
+          {joining ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Users className="mr-2 h-4 w-4" />}
+          Join Circle
         </Button>
-      </div>
-    </div>
+      </CardFooter>
+    </Card>
   );
 };
 

@@ -11,6 +11,7 @@ import NotFound from "./pages/NotFound";
 import SupportCircles from "./pages/SupportCircles";
 import EmergencySupport from "./pages/EmergencySupport";
 import Auth from "./pages/Auth";
+import Chat from "./pages/Chat";
 import { useEffect } from "react";
 
 const queryClient = new QueryClient();
@@ -38,6 +39,7 @@ const App = () => {
               <Route path="/auth/login" element={<Auth />} />
               <Route path="/auth/register" element={<Auth />} />
               <Route path="/auth/reset-password" element={<Auth />} />
+              <Route path="/chat/:circleId" element={<Chat />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
