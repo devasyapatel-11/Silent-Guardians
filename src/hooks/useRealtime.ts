@@ -31,9 +31,9 @@ export function useRealtime<T>({
     // Add subscription for each event type
     events.forEach((event) => {
       newChannel.on(
-        "postgres_changes",
-        {
-          event,
+        "postgres_changes", // This is the event type for the .on() method
+        { 
+          event, // This is the PostgreSQL event type (INSERT, UPDATE, DELETE)
           schema,
           table,
         },
