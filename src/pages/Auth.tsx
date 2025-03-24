@@ -1,8 +1,8 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { Shield, ArrowRight } from 'lucide-react';
+import { Shield, ArrowRight, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -25,7 +25,7 @@ const getPageTitle = (page: string) => {
 const Auth = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { signIn, signUp, resetPassword, loading } = useAuth();
+  const { user, signIn, signUp, resetPassword, loading } = useAuth();
   const { toast } = useToast();
   
   // Determine which auth screen to show based on URL
@@ -34,15 +34,26 @@ const Auth = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // If user is already logged in, redirect to dashboard
+  useEffect(() => {
+    if (user && authType !== 'reset-password') {
+      navigate('/dashboard');
+    }
+  }, [user, navigate, authType]);
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (isSubmitting) return;
+    
     try {
+      setIsSubmitting(true);
+      
       switch (authType) {
         case 'login':
           await signIn(email, password);
-          navigate('/dashboard');
           break;
         case 'register':
           if (password !== confirmPassword) {
@@ -53,17 +64,39 @@ const Auth = () => {
             });
             return;
           }
+          
+          if (password.length < 6) {
+            toast({
+              title: "Password too short",
+              description: "Password must be at least 6 characters",
+              variant: "destructive",
+            });
+            return;
+          }
+          
           await signUp(email, password);
-          // Stay on the page to let them check their email
+          toast({
+            title: "Account created",
+            description: "Please check your email to confirm your account",
+          });
           break;
         case 'reset-password':
           await resetPassword(email);
-          // Stay on the page to let them check their email
+          toast({
+            title: "Password reset email sent",
+            description: "Please check your email for the reset link",
+          });
           break;
       }
-    } catch (error) {
-      // Errors are handled in the auth context
+    } catch (error: any) {
       console.error('Auth error:', error);
+      toast({
+        title: "Authentication error",
+        description: error.message || "An error occurred during authentication",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
   
@@ -90,6 +123,7 @@ const Auth = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                disabled={isSubmitting}
               />
             </div>
             
@@ -103,7 +137,8 @@ const Auth = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  minLength={8}
+                  minLength={6}
+                  disabled={isSubmitting}
                 />
               </div>
             )}
@@ -118,7 +153,8 @@ const Auth = () => {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
-                  minLength={8}
+                  minLength={6}
+                  disabled={isSubmitting}
                 />
               </div>
             )}
@@ -126,9 +162,14 @@ const Auth = () => {
             <Button 
               type="submit" 
               className="w-full" 
-              disabled={loading}
+              disabled={isSubmitting || loading}
             >
-              {loading ? 'Processing...' : (
+              {isSubmitting ? (
+                <>
+                  <Loader2 size={16} className="mr-2 animate-spin" />
+                  Processing...
+                </>
+              ) : (
                 <>
                   {authType === 'login' ? 'Log In' : 
                    authType === 'register' ? 'Create Account' : 'Send Reset Link'}
