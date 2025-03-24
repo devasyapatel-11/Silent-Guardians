@@ -31,13 +31,14 @@ export function useRealtime<T>({
     // Add subscription for each event type
     events.forEach((event) => {
       newChannel.on(
-        "postgres_changes" as any,
+        "postgres_changes",
         {
           event,
           schema,
           table,
         },
         (payload: RealtimePostgresChangesPayload<T>) => {
+          console.log("Realtime payload received:", payload);
           if (event === "INSERT" && onInsert) {
             onInsert(payload.new as T);
           } else if (event === "UPDATE" && onUpdate) {
@@ -50,11 +51,15 @@ export function useRealtime<T>({
     });
 
     // Subscribe to the channel
-    newChannel.subscribe();
+    newChannel.subscribe((status) => {
+      console.log(`Realtime subscription status: ${status}`, newChannel);
+    });
+    
     setChannel(newChannel);
 
     // Cleanup on unmount
     return () => {
+      console.log("Unsubscribing from realtime channel");
       newChannel.unsubscribe();
     };
   }, [schema, table, events, onInsert, onUpdate, onDelete]);

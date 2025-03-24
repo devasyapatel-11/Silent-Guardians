@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Users, Info } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useTitle } from "@/hooks/use-title";
 
 const ChatPage = () => {
   const { circleId } = useParams<{ circleId: string }>();
@@ -19,6 +20,8 @@ const ChatPage = () => {
   const [circleName, setCircleName] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [memberCount, setMemberCount] = useState(0);
+  
+  useTitle(`Chat | Silent Guardians`);
   
   // Redirect if not logged in
   useEffect(() => {

@@ -26,9 +26,10 @@ export function useChat(circleId: string) {
   useEffect(() => {
     const fetchMessages = async () => {
       try {
+        if (!circleId) return;
+        
         setIsLoading(true);
         
-        // Use the SQL function directly since TypeScript doesn't know about the new table yet
         const { data, error } = await supabase
           .from('circle_messages')
           .select(`
@@ -36,7 +37,7 @@ export function useChat(circleId: string) {
             profiles:user_id(username, avatar_url)
           `)
           .eq("circle_id", circleId)
-          .order("created_at", { ascending: true }) as any;
+          .order("created_at", { ascending: true });
 
         if (error) {
           throw error;
@@ -114,10 +115,9 @@ export function useChat(circleId: string) {
         created_at: new Date().toISOString(),
       };
 
-      // Use the SQL function directly since TypeScript doesn't know about the new table yet
       const { error } = await supabase
         .from('circle_messages')
-        .insert(newMessage) as any;
+        .insert(newMessage);
 
       if (error) {
         throw error;

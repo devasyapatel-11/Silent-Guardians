@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User as SupabaseUser, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -22,19 +21,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
-  // Create a navigate function reference that will be populated later
-  const [navigateFn, setNavigateFn] = useState<((to: string) => void) | null>(null);
+  const navigate = useNavigate();
   
-  // Get the navigate function if we're inside a Router
-  useEffect(() => {
-    try {
-      const navigate = useNavigate();
-      setNavigateFn(() => navigate);
-    } catch (error) {
-      console.log("Router not available yet, navigation functions will be limited");
-    }
-  }, []);
-
   useEffect(() => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -80,9 +68,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         description: "You've successfully logged in",
       });
       
-      if (navigateFn) {
-        navigateFn('/dashboard');
-      }
+      navigate('/dashboard');
     } catch (error) {
       console.error("Sign in error:", error);
       throw error;
@@ -94,7 +80,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signUp = async (email: string, password: string) => {
     try {
       setLoading(true);
-      // Change to signUp method to properly register users
       const { data, error } = await supabase.auth.signUp({ 
         email, 
         password,
@@ -119,7 +104,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         description: "Please check your email to confirm your account",
       });
       
-      // Don't navigate automatically after signup - wait for email confirmation
     } catch (error) {
       console.error("Sign up error:", error);
       throw error;
@@ -149,9 +133,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         description: "You've been successfully logged out",
       });
       
-      // Navigate to home page after logout
-      if (navigateFn) {
-        navigateFn('/');
+      if (navigate) {
+        navigate('/');
       }
     } catch (error) {
       console.error("Sign out error:", error);
