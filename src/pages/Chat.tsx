@@ -70,7 +70,7 @@ const ChatPage = () => {
     fetchCircleDetails();
   }, [circleId, navigate, toast]);
 
-  // Initialize chat hook
+  // Initialize chat hook with proper circleId
   const { messages: chatMessages, isLoading: messagesLoading, sendMessage } = useChat(circleId || "");
 
   // Transform messages for the chat component

@@ -43,8 +43,6 @@ export function useChat(circleId: string) {
           throw error;
         }
 
-        console.log("Fetched messages:", data);
-
         // Transform the data to include username and avatar
         const formattedMessages = data.map((message: any) => ({
           ...message,
@@ -75,8 +73,6 @@ export function useChat(circleId: string) {
     table: "circle_messages",
     events: ["INSERT"],
     onInsert: async (newMessage) => {
-      console.log("New message received:", newMessage);
-      
       // Fetch user profile for the new message
       const { data: profileData, error } = await supabase
         .from("profiles")
@@ -115,19 +111,34 @@ export function useChat(circleId: string) {
     }
 
     try {
+      const messageId = uuidv4();
       const newMessage = {
-        id: uuidv4(),
+        id: messageId,
         circle_id: circleId,
         user_id: user.id,
         content,
         created_at: new Date().toISOString(),
       };
 
+      // Add the message optimistically to the UI
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        {
+          ...newMessage,
+          username: user.email?.split('@')[0] || "You",
+          avatar_url: null,
+        },
+      ]);
+
       const { error } = await supabase
         .from('circle_messages')
         .insert(newMessage);
 
       if (error) {
+        // Remove the optimistically added message on error
+        setMessages((prevMessages) => 
+          prevMessages.filter(msg => msg.id !== messageId)
+        );
         throw error;
       }
 

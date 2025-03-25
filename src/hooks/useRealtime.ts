@@ -25,8 +25,11 @@ export function useRealtime<T>({
   const [channel, setChannel] = useState<RealtimeChannel | null>(null);
 
   useEffect(() => {
-    // Create and configure the channel
-    const newChannel = supabase.channel(`table:${table}`);
+    // Create a unique channel name using the table name
+    const channelName = `table:${schema}:${table}`;
+    
+    // Create the channel
+    const newChannel = supabase.channel(channelName);
     
     // Add subscription for each event type
     events.forEach((event) => {
@@ -38,7 +41,8 @@ export function useRealtime<T>({
           table,
         } as any,
         (payload: RealtimePostgresChangesPayload<T>) => {
-          console.log("Realtime payload received:", payload);
+          console.log(`Realtime ${event} payload received:`, payload);
+          
           if (event === "INSERT" && onInsert) {
             onInsert(payload.new as T);
           } else if (event === "UPDATE" && onUpdate) {
@@ -52,15 +56,15 @@ export function useRealtime<T>({
 
     // Subscribe to the channel
     newChannel.subscribe((status) => {
-      console.log(`Realtime subscription status: ${status}`, newChannel);
+      console.log(`Realtime subscription status for ${table}: ${status}`);
     });
     
     setChannel(newChannel);
 
     // Cleanup on unmount
     return () => {
-      console.log("Unsubscribing from realtime channel");
-      newChannel.unsubscribe();
+      console.log(`Unsubscribing from ${table} realtime channel`);
+      supabase.removeChannel(newChannel);
     };
   }, [schema, table, events, onInsert, onUpdate, onDelete]);
 
