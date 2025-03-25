@@ -1,18 +1,38 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, X, Shield, LogIn, User } from "lucide-react";
+import { Menu, X, Shield, LogIn, User, LogOut } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useToast } from "@/hooks/use-toast";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const isMobile = useIsMobile();
+  const { toast } = useToast();
 
   const closeSheet = () => {
     setIsOpen(false);
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      toast({
+        title: "Logged out",
+        description: "You have been successfully logged out",
+      });
+    } catch (error) {
+      console.error("Sign out error:", error);
+      toast({
+        title: "Error",
+        description: "Failed to log out. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -72,12 +92,18 @@ const Header = () => {
           )}
 
           {!isMobile && user && (
-            <Button variant="outline" size="sm" asChild>
-              <Link to="/dashboard">
-                <User className="mr-2 h-4 w-4" />
-                Dashboard
-              </Link>
-            </Button>
+            <>
+              <Button variant="outline" size="sm" asChild>
+                <Link to="/dashboard">
+                  <User className="mr-2 h-4 w-4" />
+                  Dashboard
+                </Link>
+              </Button>
+              <Button variant="ghost" size="sm" onClick={handleSignOut}>
+                <LogOut className="mr-2 h-4 w-4" />
+                Sign Out
+              </Button>
+            </>
           )}
 
           {isMobile && (
@@ -144,12 +170,21 @@ const Header = () => {
                         </Button>
                       </>
                     ) : (
-                      <Button variant="outline" className="w-full" asChild>
-                        <Link to="/dashboard" onClick={closeSheet}>
-                          <User className="mr-2 h-4 w-4" />
-                          Dashboard
-                        </Link>
-                      </Button>
+                      <>
+                        <Button variant="outline" className="w-full mb-2" asChild>
+                          <Link to="/dashboard" onClick={closeSheet}>
+                            <User className="mr-2 h-4 w-4" />
+                            Dashboard
+                          </Link>
+                        </Button>
+                        <Button variant="ghost" className="w-full" onClick={() => {
+                          handleSignOut();
+                          closeSheet();
+                        }}>
+                          <LogOut className="mr-2 h-4 w-4" />
+                          Sign Out
+                        </Button>
+                      </>
                     )}
                   </div>
                 </nav>

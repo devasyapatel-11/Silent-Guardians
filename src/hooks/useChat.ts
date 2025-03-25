@@ -84,6 +84,7 @@ export function useChat(circleId: string) {
         console.error("Error fetching profile for new message:", error);
       }
 
+      // Add the new message to our state
       setMessages((prevMessages) => [
         ...prevMessages,
         {

@@ -26,7 +26,7 @@ export function useRealtime<T>({
 
   useEffect(() => {
     // Create a unique channel name using the table name
-    const channelName = `table:${schema}:${table}`;
+    const channelName = `realtime:${schema}:${table}:${Math.random().toString(36).substring(2, 11)}`;
     
     // Create the channel
     const newChannel = supabase.channel(channelName);
@@ -39,7 +39,7 @@ export function useRealtime<T>({
           event,
           schema,
           table,
-        } as any,
+        },
         (payload: RealtimePostgresChangesPayload<T>) => {
           console.log(`Realtime ${event} payload received:`, payload);
           

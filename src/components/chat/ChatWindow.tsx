@@ -34,7 +34,7 @@ const ChatWindow = ({
         ref={scrollAreaRef}
       >
         <div className="space-y-4">
-          {messages.length === 0 ? (
+          {messages.length === 0 && !isLoading ? (
             <div className="text-center text-muted-foreground my-8">
               No messages yet. Start the conversation!
             </div>
