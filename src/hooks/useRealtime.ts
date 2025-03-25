@@ -36,7 +36,7 @@ export function useRealtime<T>({
           event,
           schema,
           table,
-        },
+        } as any,
         (payload: RealtimePostgresChangesPayload<T>) => {
           console.log("Realtime payload received:", payload);
           if (event === "INSERT" && onInsert) {

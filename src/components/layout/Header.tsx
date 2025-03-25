@@ -1,16 +1,15 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, X, Shield, LogIn, User } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { useMobile } from "@/hooks/use-mobile";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { user } = useAuth();
-  const isMobile = useMobile();
+  const isMobile = useIsMobile();
 
   const closeSheet = () => {
     setIsOpen(false);
