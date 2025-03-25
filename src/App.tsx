@@ -13,6 +13,8 @@ import EmergencySupport from "./pages/EmergencySupport";
 import Auth from "./pages/Auth";
 import Chat from "./pages/Chat";
 import Discussions from "./pages/Discussions";
+import HowItWorks from "./pages/HowItWorks";
+import Resources from "./pages/Resources";
 import { useEffect } from "react";
 
 const queryClient = new QueryClient();
@@ -42,6 +44,8 @@ const App = () => {
               <Route path="/auth/reset-password" element={<Auth />} />
               <Route path="/chat/:circleId" element={<Chat />} />
               <Route path="/discussions/:circleId" element={<Discussions />} />
+              <Route path="/how-it-works" element={<HowItWorks />} />
+              <Route path="/resources" element={<Resources />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

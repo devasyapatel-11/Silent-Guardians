@@ -1,123 +1,75 @@
+import { Calendar, MessageSquare, Users, ArrowRight } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
+import { Link } from "react-router-dom";
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Users, MessageSquare, Loader2, MessagesSquare } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
-import { useNavigate } from 'react-router-dom';
-import { SupportCircle } from '@/types';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
-interface SupportCircleCardProps {
-  id: string;
-  name: string;
-  description: string;
-  memberCount: number;
-  type: 'domestic-violence' | 'workplace-harassment' | 'legal-guidance' | 'mental-health' | 'financial-independence';
-  lastActive: string;
-  onJoin: (id: string) => void;
-  isJoining?: boolean;
+interface SupportCircleCardProps extends React.HTMLAttributes<HTMLDivElement> {
+  circle: {
+    id: string;
+    name: string;
+    description: string;
+    type: string;
+    member_count: number;
+    last_active: string;
+  };
 }
 
-const SupportCircleCard = ({
-  id,
-  name,
-  description,
-  memberCount,
-  type,
-  lastActive,
-  onJoin,
-  isJoining = false,
-}: SupportCircleCardProps) => {
-  const { user } = useAuth();
-  const { toast } = useToast();
-  const [joining, setJoining] = useState(false);
-  const navigate = useNavigate();
-
-  const handleJoin = async () => {
-    if (!user) {
-      toast({
-        title: "Authentication required",
-        description: "Please sign in to join a support circle",
-        variant: "destructive",
-      });
-      navigate("/auth/login");
-      return;
-    }
-    
-    setJoining(true);
-    try {
-      await onJoin(id);
-      toast({
-        title: "Success",
-        description: "You've joined the support circle!",
-      });
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error?.message || "Failed to join support circle",
-        variant: "destructive",
-      });
-    } finally {
-      setJoining(false);
-    }
-  };
-
+export default function SupportCircleCard({
+  circle,
+  className,
+  ...props
+}: SupportCircleCardProps) {
   return (
-    <Card className="h-full transition-all hover:shadow-md">
-      <CardHeader>
-        <CardTitle>{name}</CardTitle>
-      </CardHeader>
-      
-      <CardContent>
-        <p className="text-muted-foreground">{description}</p>
-      </CardContent>
-      
-      <CardFooter className="flex justify-between">
-        <div className="flex gap-2">
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={() => {
-              if (user) {
-                navigate(`/chat/${id}`);
-              } else {
-                toast({
-                  title: "Authentication required",
-                  description: "Please sign in to access the chat",
-                  variant: "destructive",
-                });
-                navigate("/auth/login");
-              }
-            }}
-          >
-            <MessageSquare className="mr-2 h-4 w-4" />
-            Chat
-          </Button>
-          
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={() => {
-              navigate(`/discussions/${id}`);
-            }}
-          >
-            <MessagesSquare className="mr-2 h-4 w-4" />
-            Discuss
-          </Button>
+    <Card className={cn("overflow-hidden", className)} {...props}>
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-xl">{circle.name}</CardTitle>
+          <div className="flex gap-1 text-sm">
+            <Badge variant="secondary">{circle.type}</Badge>
+          </div>
         </div>
-        
-        <Button 
-          size="sm" 
-          onClick={handleJoin}
-          disabled={joining || isJoining}
-        >
-          {(joining || isJoining) ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Users className="mr-2 h-4 w-4" />}
-          Join Circle
+        <CardDescription className="pt-1.5">
+          {circle.description}
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="pb-0">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Users className="h-4 w-4" />
+          <span>{circle.member_count} members</span>
+          <span>•</span>
+          <Calendar className="h-4 w-4" />
+          <span>
+            Active{" "}
+            {formatDistanceToNow(new Date(circle.last_active), {
+              addSuffix: true,
+            })}
+          </span>
+        </div>
+      </CardContent>
+      <CardFooter className="flex justify-between pt-5">
+        <Button variant="outline" size="sm" asChild>
+          <Link to={`/discussions/${circle.id}`}>
+            <MessageSquare className="mr-2 h-4 w-4" />
+            Discussions
+          </Link>
+        </Button>
+        <Button size="sm" asChild>
+          <Link to={`/chat/${circle.id}`}>
+            Join Chat <ArrowRight className="ml-2 h-4 w-4" />
+          </Link>
         </Button>
       </CardFooter>
     </Card>
   );
-};
-
-export default SupportCircleCard;
+}

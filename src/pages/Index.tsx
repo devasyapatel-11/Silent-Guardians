@@ -114,7 +114,7 @@ const Index = () => {
                 
                 <div className="flex flex-col sm:flex-row justify-center gap-4">
                   <Button asChild size="lg" className="rounded-full px-8">
-                    <Link to="/join">
+                    <Link to="/auth/register">
                       Join Securely <ArrowRight size={16} className="ml-2" />
                     </Link>
                   </Button>

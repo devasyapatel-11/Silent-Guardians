@@ -1,199 +1,162 @@
 
-import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Shield, Menu, X, Moon, Sun, User, LogOut } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useAuth } from '@/contexts/AuthContext';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Menu, X, Shield, LogIn, User } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useMobile } from "@/hooks/use-mobile";
 
 const Header = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  const location = useLocation();
-  const { user, signOut } = useAuth();
+  const [isOpen, setIsOpen] = useState(false);
+  const { user } = useAuth();
+  const isMobile = useMobile();
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
-    
-    window.addEventListener('scroll', handleScroll);
-    
-    // Check if user prefers dark mode
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      setIsDarkMode(true);
-      document.documentElement.classList.add('dark');
-    }
-    
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
-
-  const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
-    document.documentElement.classList.toggle('dark');
-  };
-
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
-
-  const closeMobileMenu = () => {
-    setIsMobileMenuOpen(false);
-  };
-
-  const isActive = (path: string) => {
-    return location.pathname === path;
-  };
-
-  const handleSignOut = async () => {
-    await signOut();
-    closeMobileMenu();
+  const closeSheet = () => {
+    setIsOpen(false);
   };
 
   return (
-    <header 
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? 'glass py-3' : 'bg-transparent py-5'
-      }`}
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <nav className="flex items-center justify-between">
-          {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2 text-foreground" onClick={closeMobileMenu}>
-            <Shield className="h-8 w-8 text-primary animate-pulse-subtle" />
-            <span className="font-semibold text-lg">Silent Guardians</span>
+    <header className="sticky top-0 z-40 w-full border-b bg-background">
+      <div className="container flex h-16 items-center justify-between py-4">
+        <div className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2">
+            <Shield className="h-6 w-6 text-primary" />
+            <span className="text-lg font-semibold">Silent Guardians</span>
           </Link>
+        </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-1">
-            <Link to="/how-it-works" className={`nav-link ${isActive('/how-it-works') ? 'text-foreground font-medium' : ''}`}>
-              How It Works
-            </Link>
-            <Link to="/support-circles" className={`nav-link ${isActive('/support-circles') ? 'text-foreground font-medium' : ''}`}>
-              Support Circles
-            </Link>
-            <Link to="/emergency-support" className={`nav-link ${isActive('/emergency-support') ? 'text-foreground font-medium' : ''}`}>
-              Emergency Help
-            </Link>
-            <Link to="/resources" className={`nav-link ${isActive('/resources') ? 'text-foreground font-medium' : ''}`}>
-              Resources
-            </Link>
-          </div>
-
-          {/* Right-side actions */}
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={toggleDarkMode}
-              className="p-2 rounded-full hover:bg-secondary transition-colors duration-200"
-              aria-label="Toggle dark mode"
-            >
-              {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
-            </button>
-            
-            {user ? (
-              <div className="hidden md:block">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                      <User className="h-5 w-5" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem asChild>
-                      <Link to="/dashboard">Dashboard</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to="/profile">Profile</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={handleSignOut}>
-                      <LogOut className="mr-2 h-4 w-4" />
-                      <span>Log out</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            ) : (
-              <div className="hidden md:block">
-                <Button asChild variant="ghost" className="mr-2">
-                  <Link to="/auth/login">Log in</Link>
-                </Button>
-                <Button asChild className="bg-primary hover:bg-primary/90 text-white rounded-full px-6 py-2">
-                  <Link to="/auth/register">Sign Up</Link>
-                </Button>
-              </div>
-            )}
-            
-            <button
-              className="p-2 rounded-md md:hidden text-foreground"
-              onClick={toggleMobileMenu}
-              aria-label="Toggle menu"
-            >
-              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
-          </div>
-        </nav>
-
-        {/* Mobile Navigation */}
-        <div
-          className={`absolute inset-x-0 top-full mt-0 transition-all duration-300 md:hidden glass border-t border-border ${
-            isMobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'
-          }`}
-        >
-          <div className="px-4 py-3 space-y-1">
-            <Link
-              to="/how-it-works"
-              className="block px-3 py-2 rounded-md text-base font-medium hover:bg-secondary transition duration-150 ease-in-out"
-              onClick={closeMobileMenu}
-            >
-              How It Works
-            </Link>
+        {/* Desktop Navigation */}
+        {!isMobile && (
+          <nav className="hidden gap-6 md:flex">
             <Link
               to="/support-circles"
-              className="block px-3 py-2 rounded-md text-base font-medium hover:bg-secondary transition duration-150 ease-in-out"
-              onClick={closeMobileMenu}
+              className="text-sm font-medium transition-colors hover:text-primary"
             >
               Support Circles
             </Link>
             <Link
-              to="/emergency-support"
-              className="block px-3 py-2 rounded-md text-base font-medium hover:bg-secondary transition duration-150 ease-in-out"
-              onClick={closeMobileMenu}
+              to="/how-it-works"
+              className="text-sm font-medium transition-colors hover:text-primary"
             >
-              Emergency Help
+              How It Works
             </Link>
             <Link
               to="/resources"
-              className="block px-3 py-2 rounded-md text-base font-medium hover:bg-secondary transition duration-150 ease-in-out"
-              onClick={closeMobileMenu}
+              className="text-sm font-medium transition-colors hover:text-primary"
             >
               Resources
             </Link>
-            <div className="pt-2">
-              {user ? (
-                <>
-                  <Button asChild className="w-full mb-2">
-                    <Link to="/dashboard" onClick={closeMobileMenu}>Dashboard</Link>
-                  </Button>
-                  <Button variant="outline" className="w-full" onClick={handleSignOut}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <Button asChild variant="outline" className="w-full mb-2">
-                    <Link to="/auth/login" onClick={closeMobileMenu}>Log in</Link>
-                  </Button>
-                  <Button asChild className="w-full">
-                    <Link to="/auth/register" onClick={closeMobileMenu}>Sign Up</Link>
-                  </Button>
-                </>
-              )}
-            </div>
-          </div>
+            <Link
+              to="/emergency-support"
+              className="text-sm font-medium text-destructive transition-colors hover:text-destructive/80"
+            >
+              Emergency Support
+            </Link>
+          </nav>
+        )}
+
+        {/* Auth Buttons/Mobile Menu */}
+        <div className="flex items-center gap-2">
+          {!isMobile && !user && (
+            <>
+              <Button variant="ghost" size="sm" asChild>
+                <Link to="/auth/login">
+                  <LogIn className="mr-2 h-4 w-4" />
+                  Sign In
+                </Link>
+              </Button>
+              <Button size="sm" asChild>
+                <Link to="/auth/register">Join Now</Link>
+              </Button>
+            </>
+          )}
+
+          {!isMobile && user && (
+            <Button variant="outline" size="sm" asChild>
+              <Link to="/dashboard">
+                <User className="mr-2 h-4 w-4" />
+                Dashboard
+              </Link>
+            </Button>
+          )}
+
+          {isMobile && (
+            <Sheet open={isOpen} onOpenChange={setIsOpen}>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="icon">
+                  {isOpen ? (
+                    <X className="h-5 w-5" />
+                  ) : (
+                    <Menu className="h-5 w-5" />
+                  )}
+                </Button>
+              </SheetTrigger>
+              <SheetContent className="w-[300px] sm:w-[400px]">
+                <nav className="flex flex-col gap-4 mt-8">
+                  <Link
+                    to="/"
+                    className="text-lg font-medium hover:text-primary"
+                    onClick={closeSheet}
+                  >
+                    Home
+                  </Link>
+                  <Link
+                    to="/support-circles"
+                    className="text-lg font-medium hover:text-primary"
+                    onClick={closeSheet}
+                  >
+                    Support Circles
+                  </Link>
+                  <Link
+                    to="/how-it-works"
+                    className="text-lg font-medium hover:text-primary"
+                    onClick={closeSheet}
+                  >
+                    How It Works
+                  </Link>
+                  <Link
+                    to="/resources"
+                    className="text-lg font-medium hover:text-primary"
+                    onClick={closeSheet}
+                  >
+                    Resources
+                  </Link>
+                  <Link
+                    to="/emergency-support"
+                    className="text-lg font-medium text-destructive hover:text-destructive/80"
+                    onClick={closeSheet}
+                  >
+                    Emergency Support
+                  </Link>
+                  <div className="border-t mt-2 pt-4">
+                    {!user ? (
+                      <>
+                        <Button variant="outline" className="w-full mb-2" asChild>
+                          <Link to="/auth/login" onClick={closeSheet}>
+                            <LogIn className="mr-2 h-4 w-4" />
+                            Sign In
+                          </Link>
+                        </Button>
+                        <Button className="w-full" asChild>
+                          <Link to="/auth/register" onClick={closeSheet}>
+                            Join Now
+                          </Link>
+                        </Button>
+                      </>
+                    ) : (
+                      <Button variant="outline" className="w-full" asChild>
+                        <Link to="/dashboard" onClick={closeSheet}>
+                          <User className="mr-2 h-4 w-4" />
+                          Dashboard
+                        </Link>
+                      </Button>
+                    )}
+                  </div>
+                </nav>
+              </SheetContent>
+            </Sheet>
+          )}
         </div>
       </div>
     </header>
