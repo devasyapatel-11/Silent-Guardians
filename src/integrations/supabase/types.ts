@@ -70,6 +70,44 @@ export type Database = {
           },
         ]
       }
+      discussion_threads: {
+        Row: {
+          anonymous_id: string
+          circle_id: string
+          created_at: string
+          expires_at: string | null
+          id: string
+          title: string
+          view_count: number
+        }
+        Insert: {
+          anonymous_id: string
+          circle_id: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          title: string
+          view_count?: number
+        }
+        Update: {
+          anonymous_id?: string
+          circle_id?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          title?: string
+          view_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "discussion_threads_circle_id_fkey"
+            columns: ["circle_id"]
+            isOneToOne: false
+            referencedRelation: "support_circles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       emergency_services: {
         Row: {
           available_24_hours: boolean
@@ -99,6 +137,38 @@ export type Database = {
           response_time?: string
         }
         Relationships: []
+      }
+      message_votes: {
+        Row: {
+          created_at: string
+          id: string
+          message_id: string
+          user_id: string
+          vote_type: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message_id: string
+          user_id: string
+          vote_type: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message_id?: string
+          user_id?: string
+          vote_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "message_votes_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "thread_messages"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -192,11 +262,53 @@ export type Database = {
           },
         ]
       }
+      thread_messages: {
+        Row: {
+          anonymous_id: string
+          content: string
+          created_at: string
+          downvotes: number
+          id: string
+          thread_id: string
+          upvotes: number
+        }
+        Insert: {
+          anonymous_id: string
+          content: string
+          created_at?: string
+          downvotes?: number
+          id?: string
+          thread_id: string
+          upvotes?: number
+        }
+        Update: {
+          anonymous_id?: string
+          content?: string
+          created_at?: string
+          downvotes?: number
+          id?: string
+          thread_id?: string
+          upvotes?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "thread_messages_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "discussion_threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      cleanup_expired_content: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       decrement_circle_members: {
         Args: {
           circle_id: string

@@ -48,6 +48,32 @@ export const api = {
     }));
   },
   
+  getSupportCircleById: async (circleId: string): Promise<SupportCircle | null> => {
+    const { data, error } = await supabase
+      .from('support_circles')
+      .select('*')
+      .eq('id', circleId)
+      .single();
+    
+    if (error) {
+      if (error.code === 'PGRST116') {
+        // No rows returned, not an error in this case
+        return null;
+      }
+      console.error('Error fetching support circle:', error);
+      throw error;
+    }
+    
+    return {
+      id: data.id,
+      name: data.name,
+      description: data.description,
+      memberCount: data.member_count,
+      type: data.type as "domestic-violence" | "workplace-harassment" | "legal-guidance" | "mental-health" | "financial-independence",
+      lastActive: data.last_active
+    };
+  },
+  
   joinSupportCircle: async (circleId: string): Promise<{ success: boolean }> => {
     const { data: { user } } = await supabase.auth.getUser();
     

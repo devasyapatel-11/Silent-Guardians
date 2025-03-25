@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, MessageSquare, Loader2 } from 'lucide-react';
+import { Users, MessageSquare, Loader2, MessagesSquare } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
@@ -74,25 +74,38 @@ const SupportCircleCard = ({
       </CardContent>
       
       <CardFooter className="flex justify-between">
-        <Button 
-          variant="outline" 
-          size="sm"
-          onClick={() => {
-            if (user) {
-              navigate(`/chat/${id}`);
-            } else {
-              toast({
-                title: "Authentication required",
-                description: "Please sign in to access the chat",
-                variant: "destructive",
-              });
-              navigate("/auth/login");
-            }
-          }}
-        >
-          <MessageSquare className="mr-2 h-4 w-4" />
-          Chat Now
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => {
+              if (user) {
+                navigate(`/chat/${id}`);
+              } else {
+                toast({
+                  title: "Authentication required",
+                  description: "Please sign in to access the chat",
+                  variant: "destructive",
+                });
+                navigate("/auth/login");
+              }
+            }}
+          >
+            <MessageSquare className="mr-2 h-4 w-4" />
+            Chat
+          </Button>
+          
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => {
+              navigate(`/discussions/${id}`);
+            }}
+          >
+            <MessagesSquare className="mr-2 h-4 w-4" />
+            Discuss
+          </Button>
+        </div>
         
         <Button 
           size="sm" 
