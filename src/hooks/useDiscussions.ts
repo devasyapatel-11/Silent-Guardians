@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { discussionService, getAnonymousId } from '@/services/discussionService';
+import { discussionService, getAnonymousId } from '@/services/discussions';
 import { DiscussionThread, ThreadMessage, VoteAction } from '@/types/discussions';
 import { useToast } from '@/hooks/use-toast';
 import { useRealtime } from './useRealtime';
