@@ -42,21 +42,21 @@ export type Database = {
         Row: {
           circle_id: string
           content: string
-          created_at: string
+          created_at: string | null
           id: string
           user_id: string
         }
         Insert: {
           circle_id: string
           content: string
-          created_at?: string
-          id: string
+          created_at?: string | null
+          id?: string
           user_id: string
         }
         Update: {
           circle_id?: string
           content?: string
-          created_at?: string
+          created_at?: string | null
           id?: string
           user_id?: string
         }
@@ -68,13 +68,20 @@ export type Database = {
             referencedRelation: "support_circles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "fk_profile"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       discussion_threads: {
         Row: {
           anonymous_id: string
           circle_id: string
-          created_at: string
+          created_at: string | null
           expires_at: string | null
           id: string
           title: string
@@ -83,7 +90,7 @@ export type Database = {
         Insert: {
           anonymous_id: string
           circle_id: string
-          created_at?: string
+          created_at?: string | null
           expires_at?: string | null
           id?: string
           title: string
@@ -92,7 +99,7 @@ export type Database = {
         Update: {
           anonymous_id?: string
           circle_id?: string
-          created_at?: string
+          created_at?: string | null
           expires_at?: string | null
           id?: string
           title?: string
@@ -138,58 +145,23 @@ export type Database = {
         }
         Relationships: []
       }
-      message_votes: {
-        Row: {
-          created_at: string
-          id: string
-          message_id: string
-          user_id: string
-          vote_type: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          message_id: string
-          user_id: string
-          vote_type: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          message_id?: string
-          user_id?: string
-          vote_type?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "message_votes_message_id_fkey"
-            columns: ["message_id"]
-            isOneToOne: false
-            referencedRelation: "thread_messages"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       profiles: {
         Row: {
           avatar_url: string | null
-          created_at: string
           id: string
-          updated_at: string
+          updated_at: string | null
           username: string | null
         }
         Insert: {
           avatar_url?: string | null
-          created_at?: string
           id: string
-          updated_at?: string
+          updated_at?: string | null
           username?: string | null
         }
         Update: {
           avatar_url?: string | null
-          created_at?: string
           id?: string
-          updated_at?: string
+          updated_at?: string | null
           username?: string | null
         }
         Relationships: []
@@ -266,7 +238,7 @@ export type Database = {
         Row: {
           anonymous_id: string
           content: string
-          created_at: string
+          created_at: string | null
           downvotes: number
           id: string
           thread_id: string
@@ -275,7 +247,7 @@ export type Database = {
         Insert: {
           anonymous_id: string
           content: string
-          created_at?: string
+          created_at?: string | null
           downvotes?: number
           id?: string
           thread_id: string
@@ -284,7 +256,7 @@ export type Database = {
         Update: {
           anonymous_id?: string
           content?: string
-          created_at?: string
+          created_at?: string | null
           downvotes?: number
           id?: string
           thread_id?: string

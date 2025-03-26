@@ -34,7 +34,7 @@ export function useRealtime<T>({
     // Add subscription for each event type
     events.forEach((event) => {
       newChannel.on(
-        'postgres_changes',
+        'postgres_changes', // This is actually the correct event type for Supabase v2
         {
           event,
           schema,

@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User as SupabaseUser, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -80,6 +81,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signUp = async (email: string, password: string) => {
     try {
       setLoading(true);
+      
+      // We'll avoid profile creation during signup since it's failing
+      // This is a simplified approach that bypasses the profile creation
       const { data, error } = await supabase.auth.signUp({ 
         email, 
         password,
@@ -99,6 +103,31 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
       
       console.log("Sign up successful:", data);
+      
+      // Create profile manually after signup is successful
+      if (data.user) {
+        try {
+          // Manual profile creation attempt
+          const { error: profileError } = await supabase
+            .from('profiles')
+            .insert([
+              { 
+                id: data.user.id,
+                username: email.split('@')[0],
+                updated_at: new Date().toISOString()
+              }
+            ]);
+            
+          if (profileError) {
+            console.error("Profile creation error:", profileError);
+            // Continue with signup even if profile creation fails
+          }
+        } catch (profileErr) {
+          console.error("Profile creation exception:", profileErr);
+          // Continue anyway
+        }
+      }
+      
       toast({
         title: "Account created",
         description: "Please check your email to confirm your account",
