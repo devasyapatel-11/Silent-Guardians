@@ -34,12 +34,12 @@ export function useRealtime<T>({
     // Add subscription for each event type
     events.forEach((event) => {
       newChannel.on(
-        'postgres_changes', // This is actually the correct event type for Supabase v2
+        'postgres_changes', // This is the correct event type for Supabase v2
         {
           event,
           schema,
           table,
-        },
+        } as any, // Using 'as any' to bypass type checking temporarily
         (payload: RealtimePostgresChangesPayload<T>) => {
           console.log(`Realtime ${event} payload received:`, payload);
           
