@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User as SupabaseUser, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -81,6 +82,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       setLoading(true);
       
+      // Create the user account
       const { data, error } = await supabase.auth.signUp({ 
         email, 
         password,
@@ -101,11 +103,25 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       console.log("Sign up successful:", data);
       
-      toast({
-        title: "Account created",
-        description: "Please check your email to confirm your account",
-      });
+      // Check if email confirmation is enabled
+      const needsEmailConfirmation = data?.user?.identities?.length === 0;
       
+      if (needsEmailConfirmation) {
+        toast({
+          title: "Account created",
+          description: "Please check your email to confirm your account",
+        });
+      } else {
+        toast({
+          title: "Account created",
+          description: "Your account has been created successfully",
+        });
+        
+        // Auto-login if email confirmation is disabled
+        if (data.session) {
+          navigate('/dashboard');
+        }
+      }
     } catch (error) {
       console.error("Sign up error:", error);
       throw error;
